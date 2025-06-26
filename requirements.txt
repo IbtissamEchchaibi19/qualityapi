@@ -1,0 +1,12 @@
+transformers
+PyPDF2
+PyMuPDF
+camelot-py
+Pillow
+python-dotenv
+azure-core
+azure-ai-documentintelligence
+fastapi
+uvicorn[standard]
+fpdf
+python-multipart

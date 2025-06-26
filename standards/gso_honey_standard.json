@@ -1,0 +1,10 @@
+{
+    "moisture_content": "not more than 20% for most honey types; not more than 23% for heather honey",
+    "hMF_content": "not more than 40 mg/kg; not more than 80 mg/kg for honey from high temperature regions",
+    "diastase_activity": "not less than 8 Schade units; not less than 3 Schade units for honey naturally low in enzymes",
+    "sucrose_content": "not more than 5 g/100g for most honey types; not more than 10 g/100g for specific varieties; not more than 15 g/100g for lavender and borage honey",
+    "free_acidity": "not more than 50 milliequivalents per 1000 grams; not more than 100 milliequivalents per 1000 grams for acacia honey",
+    "electrical_conductivity": "not more than 0.8 mS/cm for most honey types; not less than 0.8 mS/cm for honeydew and chestnut honey",
+    "insoluble_solids": "not more than 0.5 g/100g in pressed honey; not more than 0.1 g/100g in other honey types",
+    "glucose_fructose": "not less than 60 g/100g for most honey types; not less than 45 g/100g for honeydew honey and blends"
+}
