@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Verification API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .config-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="url"], input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="url"]:focus, input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #28a745;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .result-card.failed {
+            border-left-color: #dc3545;
+        }
+
+        .result-card.error {
+            border-left-color: #ffc107;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .status-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-error {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .details {
+            margin-top: 15px;
+        }
+
+        .details-toggle {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 5px 0;
+            text-decoration: underline;
+        }
+
+        .details-content {
+            display: none;
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .certificate-info {
+            background: #e7f5e7;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .certificate-info a {
+            color: #28a745;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .certificate-info a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Document Verification API Tester</h1>
+        
+        <div class="config-section">
+            <div class="form-group">
+                <label for="apiUrl">API Base URL:</label>
+                <input type="url" id="apiUrl" value="https://qualityapi.onrender.com/" placeholder="Enter your Render API URL">
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-info" onclick="checkStatus()">🔍 Check API Status</button>
+            <button class="btn-secondary" onclick="listCertificates()">📜 List Certificates</button>
+        </div>
+
+        <div class="form-group">
+            <label for="fileInput">Upload PDF Documents:</label>
+            <input type="file" id="fileInput" accept=".pdf" multiple>
+        </div>
+
+        <div class="form-group">
+            <label for="jsonInput">Or Upload JSON Parameters:</label>
+            <input type="file" id="jsonInput" accept=".json">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="verifyDocuments()">🚀 Verify Documents</button>
+            <button class="btn-secondary" onclick="verifyFromJson()">📊 Verify from JSON</button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Processing your request...
+        </div>
+
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        function getApiUrl() {
+            return document.getElementById('apiUrl').value.replace(/\/$/, '');
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').innerHTML = '';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showError(message) {
+            hideLoading();
+            document.getElementById('results').innerHTML = `
+                <div class="result-card error">
+                    <div class="status-badge status-error">Error</div>
+                    <p><strong>Error:</strong> ${message}</p>
+                </div>
+            `;
+        }
+
+        async function checkStatus() {
+            showLoading();
+            try {
+                const response = await fetch(`${getApiUrl()}/api/status`);
+                const data = await response.json();
+                hideLoading();
+                
+                document.getElementById('results').innerHTML = `
+                    <div class="result-card">
+                        <div class="status-badge status-passed">API Status</div>
+                        <h3>🟢 API is ${data.status}</h3>
+                        <div class="details">
+                            <button class="details-toggle" onclick="toggleDetails(this)">Show Details</button>
+                            <div class="details-content">
+                                <pre>${JSON.stringify(data, null, 2)}</pre>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                showError(`Failed to check API status: ${error.message}`);
+            }
+        }
+
+        async function listCertificates() {
+            showLoading();
+            try {
+                const response = await fetch(`${getApiUrl()}/list_certificates`);
+                const data = await response.json();
+                hideLoading();
+                
+                let html = `
+                    <div class="result-card">
+                        <div class="status-badge status-passed">Certificates</div>
+                        <h3>📜 Found ${data.total_count} certificates</h3>
+                `;
+                
+                if (data.certificates.length > 0) {
+                    html += '<div class="details">';
+                    data.certificates.forEach(cert => {
+                        html += `
+                            <div class="certificate-info">
+                                <strong>${cert.name}</strong><br>
+                                Created: ${new Date(cert.created_at).toLocaleString()}<br>
+                                Size: ${(cert.size_bytes / 1024).toFixed(2)} KB<br>
+                                <a href="${getApiUrl()}/download_certificate/${cert.name}" target="_blank">📥 Download</a>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                document.getElementById('results').innerHTML = html;
+            } catch (error) {
+                showError(`Failed to list certificates: ${error.message}`);
+            }
+        }
+
+        async function verifyDocuments() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files.length) {
+                showError('Please select at least one PDF file');
+                return;
+            }
+
+            showLoading();
+            try {
+                const formData = new FormData();
+                for (let file of fileInput.files) {
+                    formData.append('files', file);
+                }
+
+                const response = await fetch(`${getApiUrl()}/verify_document`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                hideLoading();
+                displayResults(data.results);
+            } catch (error) {
+                showError(`Failed to verify documents: ${error.message}`);
+            }
+        }
+
+        async function verifyFromJson() {
+            const jsonInput = document.getElementById('jsonInput');
+            if (!jsonInput.files.length) {
+                showError('Please select a JSON file');
+                return;
+            }
+
+            showLoading();
+            try {
+                const formData = new FormData();
+                formData.append('file', jsonInput.files[0]);
+
+                const response = await fetch(`${getApiUrl()}/verify_from_json`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                hideLoading();
+                displayResults([data]);
+            } catch (error) {
+                showError(`Failed to verify from JSON: ${error.message}`);
+            }
+        }
+
+        function displayResults(results) {
+            let html = '';
+            
+            results.forEach((result, index) => {
+                const statusClass = result.status === 'passed' ? 'status-passed' : 
+                                  result.status === 'failed' ? 'status-failed' : 'status-error';
+                const cardClass = result.status === 'passed' ? '' : 
+                                 result.status === 'failed' ? 'failed' : 'error';
+                
+                html += `
+                    <div class="result-card ${cardClass}">
+                        <div class="status-badge ${statusClass}">${result.status}</div>
+                        <h3>📄 ${result.document}</h3>
+                        ${result.doc_type ? `<p><strong>Document Type:</strong> ${result.doc_type}</p>` : ''}
+                        ${result.error ? `<p><strong>Error:</strong> ${result.error}</p>` : ''}
+                        
+                        ${result.certificate_generated ? `
+                            <div class="certificate-info">
+                                <strong>✅ Certificate Generated!</strong><br>
+                                <a href="${getApiUrl()}/download_certificate/${result.certificate_path?.split('/').pop()}" target="_blank">📥 Download Certificate</a>
+                            </div>
+                        ` : ''}
+                        
+                        ${result.details ? `
+                            <div class="details">
+                                <button class="details-toggle" onclick="toggleDetails(this)">Show Verification Details</button>
+                                <div class="details-content">
+                                    <pre>${JSON.stringify(result.details, null, 2)}</pre>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('results').innerHTML = html;
+        }
+
+        function toggleDetails(button) {
+            const content = button.nextElementSibling;
+            if (content.style.display === 'none' || !content.style.display) {
+                content.style.display = 'block';
+                button.textContent = 'Hide Details';
+            } else {
+                content.style.display = 'none';
+                button.textContent = 'Show Details';
+            }
+        }
+
+        // Auto-check API status on page load
+        window.onload = function() {
+            // Give user a moment to update the URL if needed
+            setTimeout(() => {
+                if (document.getElementById('apiUrl').value !== 'https://your-render-app.onrender.com') {
+                    checkStatus();
+                }
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
